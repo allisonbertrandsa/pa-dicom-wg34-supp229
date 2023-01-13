@@ -17,12 +17,13 @@ Modality, SOP Class UID, and US Image Description Sequence.
 
 Example Files Known Compatibility
 ----------------------------------
-- Aliza - Will not read the XYZ-PA files.  Will read the XYZ files.  Displays
-  US files as single-frame slices over time.  Displays PA files as a volume.
+- Aliza (https://github.com/AlizaMedicalImaging) - Will read the XYZ files.  
+  Will not read the XYZ-PA files.  Displays US files as single-frame slices 
+  over time.  Displays PA files as a volume.
   It is suspected that the US display (slices) is the correct presentation
   for a freehand set of frames (each with a unique temporal position and 
   volume position).
-- Slicer - Will not read the XYZ-PA files.  Will read the XYZ files.  Will 
+- Slicer - Will read the XYZ files.  Will not read the XYZ-PA files.  Will 
   generate volumes of US and PA files.
 - Weasis - Reads XYZ-PA and XYZ files.  Displays all files as a stack of images.
 - dciodvfy - Will partially read the XYZ-PA files.  Will read the XYZ files. 
