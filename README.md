@@ -8,6 +8,15 @@ Current contents include:
 - Dictionary Files
 - Utilities for modifying DICOM datasets to use the proposed PA attributes. 
 
+Revision History
+-----------------
+- pa-dicom-wg34-supp229 72a817f - Public Comment version
+- After pa-dicom-wg34-supp229 72a817f - Letter Ballot version
+  - PADimensionIndexID (FL) changed to PAReconstructionIndex (UL) 
+  - Types for the TransducerResponseSequence changed from UL to FL
+  - ExcitationWavelength was added as a required tag in 
+  PAExcitationCharacteristicsSequence
+
 Examples for Photoacoustic (PA) DICOM Supplement 229
 ----------------------------------------------------------
 Directories named "XYZ-PA" have been converted to full PA modality images.  
@@ -17,15 +26,17 @@ Modality, SOP Class UID, and US Image Description Sequence.
 
 Example Files Known Compatibility
 ----------------------------------
+- Aeskulap (Debian, 2007), reads XYZ-PA as stack of frames.
 - Aliza (https://github.com/AlizaMedicalImaging) - Will read the XYZ files.  
-  As of 15-Jan-23 Aliza source update - WILL read the XYZ-PA files!  
+  As of 15-Jan-23 Aliza source update - reads the XYZ-PA files, 
+  compatible with the definitions from pa-dicom-wg34-supp229 72a817f.  
   Displays PA and US files as single-frame slices over time by default. To 
   display files as a volume, enable the "Skip 'Dimension Organization' in 
   enhanced multi-frame IODs" and possibly disable "Sort frames in enhanced 
   multi-frame IODs by IPP/IOP" prior to loading the data. 
 - Slicer - Will read the XYZ files.  Will not read the XYZ-PA files.  Will 
   generate volumes of US and PA files.
-- Weasis - Reads XYZ-PA and XYZ files.  Displays all files as a stack of images.
+- Weasis - Reads XYZ-PA and XYZ files.  Displays all files as a stack of frames.
 - dciodvfy - Will partially read the XYZ-PA files.  Will read the XYZ files. 
 - dcmdump - Reads XYZ-PA and XYZ files.
 

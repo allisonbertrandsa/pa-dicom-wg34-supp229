@@ -63,28 +63,28 @@
 #
 # Tag				VR	Name			VM	Version / Description
 #
-(3441,"WG-34 PA Excitation WL",1005)	FL	ExcitationWavelength	1	PrivateTag
-(3401,"WG-34 PA Proposed Tags",1006)	SQ	IlluminationTypeCodeSequence	1	PrivateTag
-(3401,"WG-34 PA Proposed Tags",1007)	SQ	AcousticCouplingMediumCodeSequence	1	PrivateTag
-(3401,"WG-34 PA Proposed Tags",1008)	FL	CouplingMediumTemperature 	1	PrivateTag
-(3401,"WG-34 PA Proposed Tags",1010)	SQ	TransducerTechnologySequence	1	PrivateTag
-(3401,"WG-34 PA Proposed Tags",1014)	SQ	SoundSpeedCorrectionMechanismCodeSequence	1	PrivateTag
-(3421,"WG-34 PA Sound Speed",1015)	FL	ObjectSoundSpeed	1	PrivateTag
-(3401,"WG-34 PA Proposed Tags",1017)	SQ	TransducerResponseSequence	1	PrivateTag
-(3421,"WG-34 PA Sound Speed",101A)	FL	CouplingMediumSoundSpeed	1	PrivateTag
-(3401,"WG-34 PA Proposed Tags",1092)	CS	IlluminationTranslationFlag	1	PrivateTag
-(3401,"WG-34 PA Proposed Tags",1093)	FL	PADimensionIndexID	1	PrivateTag
-(3401,"WG-34 PA Proposed Tags",1094)	SQ	ExcitationWavelengthSequence	1	PrivateTag
-(3431,"WG-34 PA Transducer Response",1095)	UL	UpperCutoffFrequency	1	PrivateTag
-(3431,"WG-34 PA Transducer Response",1096)	UL	LowerCutoffFrequency	1	PrivateTag
-(3431,"WG-34 PA Transducer Response",1097)	UL	FractionalBandwidth	1	PrivateTag
-(3431,"WG-34 PA Transducer Response",1098)	UL	CenterFrequency	1	PrivateTag
-(3401,"WG-34 PA Proposed Tags",1099)	CS	AcousticCouplingMediumFlag	1	PrivateTag
-(3411,"WG-34 PA Per-Frame Seq",1001)	SQ	PAExcitationCharacteristicsSequence	1	PrivateTag
-(3451,"WG-34 PA Per-Frame Tags",1002)	FL	ExcitationSpectralWidth	1	PrivateTag
-(3451,"WG-34 PA Per-Frame Tags",1003)	FL	ExcitationEnergy	1	PrivateTag
-(3451,"WG-34 PA Per-Frame Tags",1004)	FL	ExcitationPulseDuration	1	PrivateTag
-(3461,"WG-34 PA Image Frame Seq",10a1)	SQ	PAImageFrameTypeSequence	1	PrivateTag
+(3441,"WG-34 PA Excitation WL",05)	FL	ExcitationWavelength	1	PrivateTag
+(3401,"WG-34 PA Proposed Tags",06)	SQ	IlluminationTypeCodeSequence	1	PrivateTag
+(3401,"WG-34 PA Proposed Tags",07)	SQ	AcousticCouplingMediumCodeSequence	1	PrivateTag
+(3401,"WG-34 PA Proposed Tags",08)	FL	CouplingMediumTemperature 	1	PrivateTag
+(3401,"WG-34 PA Proposed Tags",10)	SQ	TransducerTechnologySequence	1	PrivateTag
+(3401,"WG-34 PA Proposed Tags",14)	SQ	SoundSpeedCorrectionMechanismCodeSequence	1	PrivateTag
+(3421,"WG-34 PA Sound Speed",15)	FL	ObjectSoundSpeed	1	PrivateTag
+(3401,"WG-34 PA Proposed Tags",17)	SQ	TransducerResponseSequence	1	PrivateTag
+(3421,"WG-34 PA Sound Speed",1A)	FL	CouplingMediumSoundSpeed	1	PrivateTag
+(3401,"WG-34 PA Proposed Tags",92)	CS	IlluminationTranslationFlag	1	PrivateTag
+(3401,"WG-34 PA Proposed Tags",93)	UL	PAReconstructionIndex	1	PrivateTag
+(3401,"WG-34 PA Proposed Tags",94)	SQ	ExcitationWavelengthSequence	1	PrivateTag
+(3431,"WG-34 PA Transducer Response",95)	FL	UpperCutoffFrequency	1	PrivateTag
+(3431,"WG-34 PA Transducer Response",96)	FL	LowerCutoffFrequency	1	PrivateTag
+(3431,"WG-34 PA Transducer Response",97)	FL	FractionalBandwidth	1	PrivateTag
+(3431,"WG-34 PA Transducer Response",98)	FL	CenterFrequency	1	PrivateTag
+(3401,"WG-34 PA Proposed Tags",99)	CS	AcousticCouplingMediumFlag	1	PrivateTag
+(3411,"WG-34 PA Per-Frame Seq",01)	SQ	PAExcitationCharacteristicsSequence	1	PrivateTag
+(3451,"WG-34 PA Per-Frame Tags",02)	FL	ExcitationSpectralWidth	1	PrivateTag
+(3451,"WG-34 PA Per-Frame Tags",03)	FL	ExcitationEnergy	1	PrivateTag
+(3451,"WG-34 PA Per-Frame Tags",04)	FL	ExcitationPulseDuration	1	PrivateTag
+(3461,"WG-34 PA Image Frame Seq",a1)	SQ	PAImageFrameTypeSequence	1	PrivateTag
 
 (0019,"1.2.840.113681",10)	ST	CRImageParamsCommon	1	PrivateTag
 (0019,"1.2.840.113681",11)	ST	CRImageIPParamsSingle	1	PrivateTag

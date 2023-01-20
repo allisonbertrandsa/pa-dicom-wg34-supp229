@@ -7,6 +7,7 @@ from decimal import * #for correct precision for fractional DateTime DT
 # These commands should be cherry-picked and run as needed - not set up
 #  as a full-fledged script.
 #
+# 20-Jan-23: Letter Ballot version: tag updates per WG-06 Jan-23 presentation.
 # 28-Dec-22: Tags added as private tags until permanent assignment.
 #   See: Private_Tag_Model_PC_v1.xlsx for tag and code temporary assignments.
 #
@@ -31,7 +32,7 @@ ds = pydicom.dcmread('non_PA_file.dcm')
 # PA Dimension Indexing
 # Temporal Position Time Offset (0020,930d) 
 # Image Position (Volume) (0020,9301)
-# PA Dimension Index Id (gggg,ee93) => temporary private tag = (3401,1093) 
+# PA Reconstruction Index (gggg,ee93) => temporary private tag = (3401,1093) 
 ds.DimensionIndexSequence[0].DimensionIndexPointer=pydicom.tag.Tag((0x0020,0x930d))
 ds.DimensionIndexSequence[0].FunctionalGroupPointer=pydicom.tag.Tag((0x0020,0x9310))
 ds.DimensionIndexSequence[1].DimensionIndexPointer=pydicom.tag.Tag((0x0020,0x9301))
@@ -66,7 +67,7 @@ ds.VolumeFrameOfReferenceUID = pydicom.uid.generate_uid(prefix="1.2.3.222.")
 
 # This example is a manually scanned acquisition.
 #  There are 449 frames acquired, each at a different image position and time
-#  There is one PA Dimension Index ID for the entire image
+#  There is one PA Reconstruction Index for the entire image
 padimidx = 1
 dataframes = 449
 
@@ -95,23 +96,23 @@ for i in range(dataframes):
 #### Private Tags
 # PyDICOM has some functions to help handle private tags, for example:
 # >>> block = ds.private_block(0x3401, "WG-34 PA Proposed Tags", create=True)
-# >>> block.add_new(0x93,'FL',1)
+# >>> block.add_new(0x93,'UL',1)
 # >>> block[0x93].value
 # 1
 # >>> ds[0x34011093]
-# (3401, 1093) Private tag data                    FL: 1
+# (3401, 1093) Private tag data                    UL: 1
 # After re-opening DICOM file, must redeclare (but not create) block:
 # block = ds.private_block(0x3401, "WG-34 PA Proposed Tags")
 # >>> block[0x93]
-# (3401, 1093) [PADimensionIndexID]                FL: 1.0
+# (3401, 1093) [PAReconstructionIndex]                UL: 1
 # >>> ds[0x34011093]
-# (3401, 1093) [PADimensionIndexID]                FL: 1.0
+# (3401, 1093) [PAReconstructionIndex]                UL: 1
 
 #### PA Private Tags (Global, 0x3401)
 block = ds.private_block(0x3401, "WG-34 PA Proposed Tags", create=True)
 
-#### PADimensionIndexID FL  1   (3401, 1093)
-block.add_new(0x93,'FL',1)
+#### PAReconstructionIndex UL  1   (3401, 1093)
+block.add_new(0x93,'UL',1)
 
 #### ExcitationWavelengthSequence   SQ  1   (3401, 1094)
 ds.add_new((0x3401,0x1094),'SQ',[])
@@ -155,10 +156,10 @@ ds.add_new((0x3401,0x1017),'SQ',[])
 ds[0x34011017].value.append(pydicom.dataset.Dataset())
 #Private Creator required inside sequence
 ds[0x34011017].value[0].add_new((0x3431,0x0010),'LO','WG-34 PA Transducer Response')
-ds[0x34011017].value[0].add_new((0x3431,0x1098),'UL',10)
-ds[0x34011017].value[0].add_new((0x3431,0x1097),'UL','')
-ds[0x34011017].value[0].add_new((0x3431,0x1096),'UL','')
-ds[0x34011017].value[0].add_new((0x3431,0x1095),'UL','')
+ds[0x34011017].value[0].add_new((0x3431,0x1098),'FL',10)
+ds[0x34011017].value[0].add_new((0x3431,0x1097),'FL','')
+ds[0x34011017].value[0].add_new((0x3431,0x1096),'FL','')
+ds[0x34011017].value[0].add_new((0x3431,0x1095),'FL','')
 
 #### TransducerTechnologySequence   SQ  1   (3401, 1010)
 ds.add_new((0x3401,0x1010),'SQ',[])
@@ -218,6 +219,8 @@ for i in range(dataframes):
     pfg.add_new((0x3411,0x1001),'SQ',[])
     pfg[0x34111001].value.append(pydicom.dataset.Dataset())
     #Private Creator required inside sequence
+    pfg[0x34111001].value[0].add_new((0x3441,0x0010),'LO','WG-34 PA Excitation WL')
+    pfg[0x34111001].value[0].add_new((0x3441,0x1005),'FL',757.0)
     pfg[0x34111001].value[0].add_new((0x3451,0x0010),'LO','WG-34 PA Per-Frame Tags')
     pfg[0x34111001].value[0].add_new((0x3451,0x1002),'FL',2+round(random.random(),2))
     pfg[0x34111001].value[0].add_new((0x3451,0x1003),'FL',11+round(random.random(),2))
