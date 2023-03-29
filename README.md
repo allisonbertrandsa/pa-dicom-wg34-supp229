@@ -92,9 +92,9 @@ full-fledged script.
 
 Related Projects & Organizations
 ---------------------------------
-https://www.dicomstandard.org/activity/wgs/wg-34 - Working Group contact
-https://senomedical.com/ - Example 1 & Example 2 were provided by Seno Medical
-https://www.photosound.com/ - Provided example file, see examples/Community/PhotoSound
-https://github.com/IPASC - Metadata for the PA DICOM standard was derived from
+- https://www.dicomstandard.org/activity/wgs/wg-34 - Working Group contact
+- https://senomedical.com/ - Example 1 & Example 2 were provided by Seno Medical
+- https://www.photosound.com/ - Provided example file, see examples/Community/PhotoSound
+- https://github.com/IPASC - Metadata for the PA DICOM standard was derived from
 IPASC metadata
 
