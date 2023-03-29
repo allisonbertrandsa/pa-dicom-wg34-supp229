@@ -16,6 +16,7 @@ Revision History
   - Types for the TransducerResponseSequence changed from UL to FL
   - ExcitationWavelength was added as a required tag in 
   PAExcitationCharacteristicsSequence
+- 85e6027 - New Community example file from PhotoSound  
 
 Note that although some of the attributes in Supplement 229 have 
 been modified during the transition from LB (Letter Ballot) to the 
