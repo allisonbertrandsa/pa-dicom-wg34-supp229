@@ -17,6 +17,11 @@ Revision History
   - ExcitationWavelength was added as a required tag in 
   PAExcitationCharacteristicsSequence
 
+Note that although some of the attributes in Supplement 229 have 
+been modified during the transition from LB (Letter Ballot) to the 
+current draft FT (Final Text), the examples and test scripts provided
+here are still all Letter Ballot level (unless otherwise noted).
+
 Examples for Photoacoustic (PA) DICOM Supplement 229
 ----------------------------------------------------------
 Directories named "XYZ-PA" have been converted to full PA modality images.  
@@ -68,6 +73,10 @@ acquired for each frame of a freehand scan of one target.  One PA file
 contains data from one wavelength and the second PA file contains data from
 two wavelengths combined algorithmically during the acquisition process.
 
+Community Examples
+------------------------------
+Examples provided by the community as proof-of-concept of the PA standard.
+
 PyDICOM Helper Commands
 ------------------------------
 utils/pa_dicom_private_tags.py contains example commands from the PyDICOM library
@@ -80,6 +89,7 @@ Related Projects & Organizations
 ---------------------------------
 https://www.dicomstandard.org/activity/wgs/wg-34 - Working Group contact
 https://senomedical.com/ - Example 1 & Example 2 were provided by Seno Medical
+https://www.photosound.com/ - Provided example file, see examples/Community/PhotoSound
 https://github.com/IPASC - Metadata for the PA DICOM standard was derived from
 IPASC metadata
 
