@@ -79,7 +79,11 @@ Examples provided by the community as proof-of-concept of the PA standard.
 
 PyDICOM Helper Commands
 ------------------------------
-utils/pa_dicom_private_tags.py contains example commands from the PyDICOM library
+- utils/encap_PNG_to_PA.py is a basic example script which reads all PNG files
+in the local directory and write them to a PA file (with US modality and 
+USImageDescriptionSequence by default).  It has options for scaling and color 
+conversion (RGBA->RGB or RGBA->MONOCHROME2).  
+- utils/pa_dicom_private_tags.py contains example commands from the PyDICOM library
 which were used to convert a file in a format similar to Enhanced US Volume 
 (3DUS) to the proposed PA format and attributes.  These commands should be 
 cherry-picked and run as needed; the commands are not set up as a 
