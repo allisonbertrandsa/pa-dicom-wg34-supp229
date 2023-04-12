@@ -40,6 +40,8 @@ Example Files Known Compatibility
   display files as a volume, enable the "Skip 'Dimension Organization' in 
   enhanced multi-frame IODs" and possibly disable "Sort frames in enhanced 
   multi-frame IODs by IPP/IOP" prior to loading the data. 
+- MedDream-DICOM-Viewer-8.1.0 - Will read the XYZ files.  Will read the Raw XYZ-PA file, but gives an undefined error on the Processed XYZ-PA file (TBR).
+- Onis 3.0.3 - Reads XYZ-PA and XYZ files.  Displays all files as a stack of frames.
 - Slicer - Will read the XYZ files.  Will not read the XYZ-PA files.  Will 
   generate volumes of US and PA files.
 - Visus JiveX Viewer - Reads XYZ-PA and XYZ files.  Displays all files as a stack of frames.
