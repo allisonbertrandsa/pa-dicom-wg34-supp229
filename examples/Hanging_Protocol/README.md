@@ -1,0 +1,1 @@
+PAUS_Ex2_1by3_HangingProtocol.dcm - a draft hanging protocol for the files in Example2 which draws one row of three images with each image assigned to an Display Set by selection of the Series Description.  No viewer has yet been located to test this Hanging Protocol file.
