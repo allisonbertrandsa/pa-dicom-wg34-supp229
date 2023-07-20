@@ -5,12 +5,14 @@ from PIL import Image
 import io
 import os
 
+from natsort import natsorted #for sorting os dir with numbered files
 from pydicom.uid import generate_uid, JPEGExtended
 from pydicom._storage_sopclass_uids import SecondaryCaptureImageStorage
 import random #for generating fake data
 from decimal import * #for correct precision for fractional DateTime DT
 
 # Reads all PNG files in the local directory and write them to a PA file.
+# Based on DICOM 2023c release.
 # If all PNG files are not the same size, program will exit.
 # Prior to running:
 # - Update output_file name.
@@ -21,9 +23,9 @@ from decimal import * #for correct precision for fractional DateTime DT
 # Original idea for writing:
 # https://stackoverflow.com/questions/58518357/how-to-create-jpeg-compressed-dicom-dataset-using-pydicom
 
-output_file = "oacombined-col-trsp-pa.dcm"
+output_file = "oacombined-bw-pa-2023c.dcm"
 
-color = True
+color = False
 if color:
     print("Writing as YBR_FULL_422.")
 else:
@@ -42,19 +44,23 @@ if resize_img:
 ds = Dataset()
 ds.is_little_endian = True
 ds.is_implicit_VR = True
-# First temporarily as 3DUS, then convert to PA
+
+ds.SOPClassUID = "1.2.840.10008.5.1.4.1.1.6.3"
+ds.Modality = "PA"
+
+# May want to write as 3DUS for tools not yet supporting PA
 # Enhanced US Volume Storage
-ds.SOPClassUID = "1.2.840.10008.5.1.4.1.1.6.2"
-ds.Modality = "US"
+#ds.SOPClassUID = "1.2.840.10008.5.1.4.1.1.6.2"
+#ds.Modality = "US"
 
 # Set/add some required tags
 ds.PatientName="PA^Frames"
 ds.ManufacturerModelName="Test"
 ds.StudyDescription=ds.ManufacturerModelName
 ds.SeriesDescription='PA Multiframe'
-ds.PatientID="20221228-1"
+ds.PatientID="20230711-1"
 ds.SeriesNumber=1
-ds.StudyID="2022122802"
+ds.StudyID="2023071102"
 ds.PatientBirthDate=""
 ds.PatientSex=""
 ds.ReferringPhysicianName=""
@@ -66,40 +72,49 @@ ds.AcquisitionTimeSynchronized="N"
 ds.Manufacturer="Seno"
 ds.ManufacturerModelName="Test PA"
 ds.DeviceSerialNumber="Any"
-ds.SoftwareVersions="20221228-1"
+ds.SoftwareVersions="20230711-1"
 ds.InstanceNumber=1
 ds.PatientOrientation=""
 ds.BurnedInAnnotation="NO"
 ds.Laterality = 'L'
-ds.AcquisitionDateTime='20221228150251.105768'
-ds.StudyDate='20221228'
-ds.ContentDate='20221228'
+ds.AcquisitionDateTime='20230711150251.105768'
+ds.StudyDate='20230711'
+ds.ContentDate='20230711'
 ds.StudyTime='150115'
 ds.ContentTime='150251'
 
-ds.PlanarConfiguration = 0
 if color:
     ds.SamplesPerPixel = 3
-else:
+    ds.PhotometricInterpretation = "YBR_FULL_422"
+    ds.PixelPresentation = "TRUE_COLOR"
+    # TODO: TRUE_COLOR will also need ICC Profile
+else: 
     ds.SamplesPerPixel = 1
+    ds.PhotometricInterpretation = "MONOCHROME2"
+    ds.PixelPresentation = "MONOCHROME"
+    ds.PresentationLUTShape = "IDENTITY"
+
+ds.VolumetricProperties = 'VOLUME'
+ds.VolumeBasedCalculationTechnique = 'NONE'
 ds.BitsAllocated = 8
 ds.BitsStored = 8
 ds.HighBit = 7
 ds.PixelRepresentation = 0
-if color:
-    ds.PhotometricInterpretation = "YBR_FULL_422"
-else: 
-    ds.PhotometricInterpretation = "MONOCHROME2"
+ds.PlanarConfiguration = 0
+ds.PositionMeasuringDeviceUsed='FREEHAND'
 
-# Set up PA attributes 
+# PA Dimension Index Sequence 
 ds.DimensionIndexSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
+# Temporal Position Time Offset 
 ds.DimensionIndexSequence[0].DimensionIndexPointer=pydicom.tag.Tag((0x0020,0x930d))
 ds.DimensionIndexSequence[0].FunctionalGroupPointer=pydicom.tag.Tag((0x0020,0x9310))
 ds.DimensionIndexSequence.append(pydicom.dataset.Dataset())
+# Image Position (Volume)
 ds.DimensionIndexSequence[1].DimensionIndexPointer=pydicom.tag.Tag((0x0020,0x9301))
 ds.DimensionIndexSequence[1].FunctionalGroupPointer=pydicom.tag.Tag((0x0020,0x930e))
 ds.DimensionIndexSequence.append(pydicom.dataset.Dataset())
-ds.DimensionIndexSequence[2].DimensionIndexPointer=pydicom.tag.Tag((0x3401,0x1093))
+# Image Data Type Sequence
+ds.DimensionIndexSequence[2].DimensionIndexPointer=pydicom.tag.Tag((0x0018,0x9807))
 
 #Correct UIDs as needed
 #If also writing US files, ensure PA and US files have different 
@@ -114,6 +129,7 @@ ds.StudyInstanceUID = s_uid
 ds.SeriesInstanceUID = pydicom.uid.generate_uid(prefix="1.2.3.123.")
 ds.fix_meta_info()
 
+ds.DimensionOrganizationType = "3D"
 ds.DimensionOrganizationSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
 ds.DimensionOrganizationSequence[0].DimensionOrganizationUID = dim_uid
 ds.DimensionIndexSequence[0].DimensionOrganizationUID = dim_uid
@@ -128,7 +144,7 @@ imlist = []
 
 i=0
 # Single frames required for compression
-for file in os.listdir("./"):
+for file in natsorted(os.listdir("./")):
     if file.endswith(".png"):
         img_file = os.path.join("./", file)
         jpg_img = Image.open(img_file)
@@ -170,11 +186,6 @@ ds.Rows = img_rows
 ds.Columns = img_cols
 ds.NumberOfFrames = num_frames = i
 
-# More PA attributes
-#  For this example each frame is assumed to be at a different image position and time
-#  There is one PA Reconstruction Index for the entire image
-padimidx = 1
-
 # Script hints:
 # PyDICOM: must ADD sequences if not already present:
 #     mySequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
@@ -188,156 +199,65 @@ ds.ImageType=['ORIGINAL','PRIMARY','VOLUME','NONE']
 # - FFFFFF - fractional second, one millionth of a second
 # - One millisecond is 0.001000
 
-start = Decimal('20230214150251.105768')
+start = Decimal('20230711150251.105768')
 
 pfg = ds.PerFrameFunctionalGroupsSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
+
+#  For this example each frame is assumed to be at a different image position and time
+#  There is one ImageDataTypeSequence Dimension Index for the entire image
+padimidx = 1
 
 for i in range(num_frames):
     # Create one per-frame group per frame
     if i>0: 
         pfg.append(pydicom.dataset.Dataset())
-
+        
+    # Add dimension index values for time and volume; the third index is a Shared 
+    # Functional Group, constant for all frames (ImageDataTypeSequence)
     pfg[i].PlanePositionVolumeSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
     pfg[i].FrameContentSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
     pfg[i].TemporalPositionSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
-    pfg[i].ImageDataTypeSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
 
     pfg[i].FrameContentSequence[0].DimensionIndexValues=[i+1,i+1,padimidx]
     pfg[i].PlanePositionVolumeSequence[0].ImagePositionVolume=[1,1,i*0.5]
     pfg[i].TemporalPositionSequence[0].TemporalPositionTimeOffset = i*0.01
     pfg[i].FrameContentSequence[0].FrameAcquisitionDateTime = str(start + Decimal(ds.PerFrameFunctionalGroupsSequence[i].TemporalPositionSequence[0].TemporalPositionTimeOffset).quantize(Decimal('.000001'), rounding=ROUND_HALF_DOWN))
     pfg[i].FrameContentSequence[0].FrameReferenceDateTime = str(Decimal(ds.PerFrameFunctionalGroupsSequence[i].FrameContentSequence[0].FrameAcquisitionDateTime) + Decimal('0.05'))
-    pfg[i].ImageDataTypeSequence[0].DataType = 'TISSUE_INTENSITY'
+    
+#### ExcitationWavelengthSequence   SQ  1   (0018,9825)
+# ExcitationWavelength    FD   1   (0018,9826)
+ds.add_new((0x0018,0x9825),'SQ',[])
+# Two wavelengths for this example
+ds[0x00189825].value.append(pydicom.dataset.Dataset())
+ds[0x00189825].value[0].add_new((0x0018,0x9826),'FD',757.0)
+ds[0x00189825].value.append(pydicom.dataset.Dataset())
+ds[0x00189825].value[1].add_new((0x0018,0x9826),'FD',1064.0)
 
-#### PA Private Tags (Global, 0x3401)
-block = ds.private_block(0x3401, "WG-34 PA Proposed Tags", create=True)
+#### IlluminationTranslationFlag    CS  1   (0018,9828)
+ds.add_new((0x0018,0x9828),'CS','NO')
 
-#### PAReconstructionIndex UL  1   (3401, 1093)
-block.add_new(0x93,'UL',1)
-
-#### ExcitationWavelengthSequence   SQ  1   (3401, 1094)
-ds.add_new((0x3401,0x1094),'SQ',[])
-ds[0x34011094].value.append(pydicom.dataset.Dataset())
-#Private Creator required inside sequence dataset
-ds[0x34011094].value[0].add_new((0x3441,0x0010),'LO','WG-34 PA Excitation WL')
-ds[0x34011094].value[0].add_new((0x3441,0x1005),'FL',757.0)
-ds[0x34011094].value.append(pydicom.dataset.Dataset())
-#Private Creator required inside sequence dataset
-ds[0x34011094].value[1].add_new((0x3441,0x0010),'LO','WG-34 PA Excitation WL')
-ds[0x34011094].value[1].add_new((0x3441,0x1005),'FL',1064.0)
-
-#### IlluminationTranslationFlag    CS  1   (3401, 1092)
-block.add_new(0x92,'CS','NO')
-
-#### IlluminationTypeCodeSequence   SQ  1   (3401, 1006)
+#### IlluminationTypeCodeSequence   SQ  1   (0022,0016)
 # Code Value    (0008,0100) SH  0006    103401
 # Coding Scheme Designator  (0008,0102) SH  0004    DCM
 # Code Meaning  (0008,0104) LO  0016    Single-side illumination
-ds.add_new((0x3401,0x1006),'SQ',[])
-ds[0x34011006].value.append(pydicom.dataset.Dataset())
-ds[0x34011006].value[0].add_new((0x0008,0x0100),'SH','103401')
-ds[0x34011006].value[0].add_new((0x0008,0x0102),'SH','DCM')
-ds[0x34011006].value[0].add_new((0x0008,0x0104),'LO','Single-side illumination')
+ds.add_new((0x0022,0x0016),'SQ',[])
+ds[0x00220016].value.append(pydicom.dataset.Dataset())
+ds[0x00220016].value[0].add_new((0x0008,0x0100),'SH','103401')
+ds[0x00220016].value[0].add_new((0x0008,0x0102),'SH','DCM')
+ds[0x00220016].value[0].add_new((0x0008,0x0104),'LO','Single-side illumination')
 
-#### AcousticCouplingMediumFlag CS  1   (3401, 1099)
-block.add_new(0x99,'CS','YES')
+#### AcousticCouplingMediumFlag CS  1   (0018,9829)
+ds.add_new((0x0018,0x9829),'CS','YES')
 
-#### AcousticCouplingMediumCodeSequence SQ  1   (3401, 1007)
-ds.add_new((0x3401,0x1007),'SQ',[])
-ds[0x34011007].value.append(pydicom.dataset.Dataset())
-ds[0x34011007].value[0].add_new((0x0008,0x0100),'SH','1004163002')
-ds[0x34011007].value[0].add_new((0x0008,0x0102),'SH','SCT')
-ds[0x34011007].value[0].add_new((0x0008,0x0104),'LO','Ultrasound Coupling Gel')
+#### AcousticCouplingMediumCodeSequence SQ  1   (0018,982A)
+ds.add_new((0x0018,0x982A),'SQ',[])
+ds[0x0018982A].value.append(pydicom.dataset.Dataset())
+ds[0x0018982A].value[0].add_new((0x0008,0x0100),'SH','1004163002')
+ds[0x0018982A].value[0].add_new((0x0008,0x0102),'SH','SCT')
+ds[0x0018982A].value[0].add_new((0x0008,0x0104),'LO','Ultrasound Coupling Gel')
 
-#### CouplingMediumTemperature  FL  1   (3401, 1008)
-block.add_new(0x08,'FL',30)
-
-#### TransducerResponseSequence SQ  1   (3401, 1017)
-ds.add_new((0x3401,0x1017),'SQ',[])
-ds[0x34011017].value.append(pydicom.dataset.Dataset())
-#Private Creator required inside sequence
-ds[0x34011017].value[0].add_new((0x3431,0x0010),'LO','WG-34 PA Transducer Response')
-ds[0x34011017].value[0].add_new((0x3431,0x1098),'FL',10)
-ds[0x34011017].value[0].add_new((0x3431,0x1097),'FL','')
-ds[0x34011017].value[0].add_new((0x3431,0x1096),'FL','')
-ds[0x34011017].value[0].add_new((0x3431,0x1095),'FL','')
-
-#### TransducerTechnologySequence   SQ  1   (3401, 1010)
-ds.add_new((0x3401,0x1010),'SQ',[])
-ds[0x34011010].value.append(pydicom.dataset.Dataset())
-ds[0x34011010].value[0].add_new((0x0008,0x0100),'SH','103413')
-ds[0x34011010].value[0].add_new((0x0008,0x0102),'SH','DCM')
-ds[0x34011010].value[0].add_new((0x0008,0x0104),'LO','Piezocomposite Transducer')
-
-#### SoundSpeedCorrectionMechanismCodeSequence  SQ  1   (3401, 1014)
-# Code Sequence Macro
-# ObjectSoundSpeed  FL  1   (3421, 1015)
-ds.add_new((0x3401,0x1014),'SQ',[])
-ds[0x34011014].value.append(pydicom.dataset.Dataset())
-ds[0x34011014].value[0].add_new((0x0008,0x0100),'SH','103416')
-ds[0x34011014].value[0].add_new((0x0008,0x0102),'SH','DCM')
-ds[0x34011014].value[0].add_new((0x0008,0x0104),'LO','Uniform Speed of Sound Correction')
-#Private Creator required inside sequence
-ds[0x34011014].value[0].add_new((0x3421,0x0010),'LO','WG-34 PA Sound Speed')
-ds[0x34011014].value[0].add_new((0x3421,0x1015),'FL',1480.0)
-
-#### Per-Frame Updates
-
-# US Image Description Sequence has the same attributes as PA Image Frame Type Sequence
-# Leaving the US group in place of the PA group temporarily - may impact viewers if removed
-#>>> ds.PerFrameFunctionalGroupsSequence[0].USImageDescriptionSequence[0]
-#(0008, 9007) Frame Type                          CS: ['ORIGINAL', 'PRIMARY', 'VOLUME', 'NONE']
-#(0008, 9206) Volumetric Properties               CS: 'VOLUME'
-#(0008, 9207) Volume Based Calculation Technique  CS: 'NONE'
-#
-for i in range(num_frames):
-    ds.PerFrameFunctionalGroupsSequence[i].USImageDescriptionSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
-    pfg=ds.PerFrameFunctionalGroupsSequence[i].USImageDescriptionSequence[0]
-    pfg.FrameType = ['ORIGINAL','PRIMARY','VOLUME','NONE']
-    pfg.VolumetricProperties = 'VOLUME'
-    pfg.VolumeBasedCalculationTechnique = 'NONE'
-
-for i in range(num_frames):
-    ds.PerFrameFunctionalGroupsSequence[i].FrameContentSequence[0].FrameAcquisitionDuration = 100
-
-#### PAImageFrameTypeSequence   SQ  1   (3411, 10a1)
-# for i in range(num_frames):
-    # pfg=ds.PerFrameFunctionalGroupsSequence[i]
-    # pfg.add_new((0x3461,0x0010),'LO','WG-34 PA Image Frame Seq')
-    # pfg.add_new((0x3461,0x10A1),'SQ',[])
-    # pfg[0x346110A1].value.append(pydicom.dataset.Dataset())
-    # pfg[0x346110A1].value[0].add_new((0x0008,0x9007),'CS',['ORIGINAL','PRIMARY','VOLUME','NONE'])
-    # pfg[0x346110A1].value[0].add_new((0x0008,0x9206),'CS','VOLUME')
-    # pfg[0x346110A1].value[0].add_new((0x0008,0x9207),'CS','NONE')
-
-# ds.Modality='PA'
-## SOPClassUID=PhotoacousticImageStorage in Supp229, temporary value of 1.2.840.10008.5.1.2.3.45
-# ds.SOPClassUID='1.2.840.10008.5.1.2.3.45'
-
-# Direct sequence additions example: https://github.com/pydicom/pydicom/issues/474
-
-#### PA Private Tags (Per-Frame)
-
-#### PAExcitationCharacteristicsSequence    SQ  1   (3411, 1001)
-# ExcitationSpectralWidth   FL  1   (3451, 1002)
-# ExcitationEnergy  FL  1   (3451, 1003)
-# ExcitationPulseDuration   FL  1   (3451, 1004)
-
-for i in range(num_frames):
-    pfg=ds.PerFrameFunctionalGroupsSequence[i]
-    pfg.add_new((0x3411,0x0010),'LO','WG-34 PA Per-Frame Seq')
-    pfg.add_new((0x3411,0x1001),'SQ',[])
-    pfg[0x34111001].value.append(pydicom.dataset.Dataset())
-    #Private Creator required inside sequence
-    pfg[0x34111001].value[0].add_new((0x3441,0x0010),'LO','WG-34 PA Excitation WL')
-    pfg[0x34111001].value[0].add_new((0x3441,0x1005),'FL',757.0)
-    pfg[0x34111001].value[0].add_new((0x3451,0x0010),'LO','WG-34 PA Per-Frame Tags')
-    pfg[0x34111001].value[0].add_new((0x3451,0x1002),'FL',2+round(random.random(),2))
-    pfg[0x34111001].value[0].add_new((0x3451,0x1003),'FL',11+round(random.random(),2))
-    pfg[0x34111001].value[0].add_new((0x3451,0x1004),'FL',8+round(random.random(),2))
-
-#### Position Measuring Device Used (0018,980C)
-ds.PositionMeasuringDeviceUsed='FREEHAND'
+#### AcousticCouplingMediumTemperature  FD  1   (0018,982B)
+ds.add_new((0x0018,0x982B),'FD',30)
 
 #### Transducer Geometry Code Sequence  (0018,980D)
 ds.TransducerGeometryCodeSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
@@ -345,25 +265,102 @@ ds.TransducerGeometryCodeSequence[0].CodeValue='125252'
 ds.TransducerGeometryCodeSequence[0].CodingSchemeDesignator='DCM'
 ds.TransducerGeometryCodeSequence[0].CodeMeaning='Linear ultrasound transducer geometry'
 
-#### Reconstruction Algorithm Sequence  (0018,993D)
-ds.ReconstructionAlgorithmSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
-ds.ReconstructionAlgorithmSequence[0].AlgorithmName='WaveLength1-Wavelength2-Relative'
-ds.ReconstructionAlgorithmSequence[0].AlgorithmVersion='1.0.0'
-ds.ReconstructionAlgorithmSequence[0].AlgorithmFamilyCodeSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
-ds.ReconstructionAlgorithmSequence[0].AlgorithmFamilyCodeSequence[0].CodeValue='113961'
-ds.ReconstructionAlgorithmSequence[0].AlgorithmFamilyCodeSequence[0].CodingSchemeDesignator='DCM'
-ds.ReconstructionAlgorithmSequence[0].AlgorithmFamilyCodeSequence[0].CodeMeaning='Reconstruction Algorithm'
+#### TransducerResponseSequence SQ  1   (0018,982C)
+ds.add_new((0x0018,0x982C),'SQ',[])
+ds[0x0018982C].value.append(pydicom.dataset.Dataset())
+ds[0x0018982C].value[0].add_new((0x0018,0x982D),'FD',10)
+ds[0x0018982C].value[0].add_new((0x0018,0x982E),'FD','')
+ds[0x0018982C].value[0].add_new((0x0018,0x982F),'FD','')
+ds[0x0018982C].value[0].add_new((0x0018,0x9830),'FD','')
+
+#### TransducerTechnologySequence   SQ  1   (0018,9831)
+ds.add_new((0x0018,0x9831),'SQ',[])
+ds[0x00189831].value.append(pydicom.dataset.Dataset())
+ds[0x00189831].value[0].add_new((0x0008,0x0100),'SH','130815')
+ds[0x00189831].value[0].add_new((0x0008,0x0102),'SH','DCM')
+ds[0x00189831].value[0].add_new((0x0008,0x0104),'LO','Piezocomposite Transducer')
+
+#### SoundSpeedCorrectionMechanismCodeSequence  SQ  1   (0018,9832)
+# Code Sequence Macro
+# ObjectSoundSpeed  FD  1   (0018,9833)
+ds.add_new(((0x0018,0x9832)),'SQ',[])
+ds[0x00189832].value.append(pydicom.dataset.Dataset())
+ds[0x00189832].value[0].add_new((0x0008,0x0100),'SH','130818')
+ds[0x00189832].value[0].add_new((0x0008,0x0102),'SH','DCM')
+ds[0x00189832].value[0].add_new((0x0008,0x0104),'LO','Uniform Speed of Sound Correction')
+ds[0x00189832].value[0].add_new((0x0018,0x9833),'FD',1540)
+
+# Direct sequence additions example: https://github.com/pydicom/pydicom/issues/474
+
+#### Per-Frame Attributes
+
+#### PhotoacousticExcitationCharacteristicsSequence    SQ  1   (0018,9821)
+# ExcitationWavelength    FD   1   (0018,9826)
+# ExcitationSpectralWidth   FD  1   (0018,9822)
+# ExcitationEnergy  FD  1   (0018,9823)
+# ExcitationPulseDuration   FD  1   (0018,9824)
+
+for i in range(num_frames):
+    ds.PerFrameFunctionalGroupsSequence[i].FrameContentSequence[0].FrameAcquisitionDuration = 100
+    pfg=ds.PerFrameFunctionalGroupsSequence[i]
+    pfg.add_new((0x0018,0x9821),'SQ',[])
+    pfg[0x00189821].value.append(pydicom.dataset.Dataset())
+    pfg[0x00189821].value[0].add_new((0x0018,0x9826),'FD',757.0)
+    pfg[0x00189821].value[0].add_new((0x0018,0x9822),'FD',2+round(random.random(),2))
+    pfg[0x00189821].value[0].add_new((0x0018,0x9823),'FD',11+round(random.random(),2))
+    pfg[0x00189821].value[0].add_new((0x0018,0x9824),'FD',8+round(random.random(),2))
+    pfg[0x00189821].value.append(pydicom.dataset.Dataset())
+    pfg[0x00189821].value[1].add_new((0x0018,0x9826),'FD',1064.0)
+    pfg[0x00189821].value[1].add_new((0x0018,0x9822),'FD',2+round(random.random(),2))
+    pfg[0x00189821].value[1].add_new((0x0018,0x9823),'FD',11+round(random.random(),2))
+    pfg[0x00189821].value[1].add_new((0x0018,0x9824),'FD',8+round(random.random(),2))
 
 ### Shared frame DICOM metadata
-ds.FrameIncrementPointer = pydicom.tag.Tag((0x5200,0x9230)) #0x0020,0x0032))
+ds.FrameIncrementPointer = pydicom.tag.Tag((0x5200,0x9230)) 
 ds.SharedFunctionalGroupsSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
-ds.SharedFunctionalGroupsSequence[0].PixelMeasuresSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
-ds.SharedFunctionalGroupsSequence[0].PixelMeasuresSequence[0].SliceThickness="0.1"
-ds.SharedFunctionalGroupsSequence[0].PixelMeasuresSequence[0].PixelSpacing=[0.50251257030209, 0.5025125703020]
-ds.SharedFunctionalGroupsSequence[0].PixelMeasuresSequence[0].SpacingBetweenSlices=0.50251257030209
-ds.SharedFunctionalGroupsSequence[0].PlaneOrientationVolumeSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
-ds.SharedFunctionalGroupsSequence[0].PlaneOrientationVolumeSequence[0].ImageOrientationVolume = [1, 0, 0, 0, 1, 0]
+sfg = ds.SharedFunctionalGroupsSequence[0]
+sfg.PixelMeasuresSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
+sfg.PixelMeasuresSequence[0].SliceThickness="0.1"
+sfg.PixelMeasuresSequence[0].PixelSpacing=[0.50251257030209, 0.5025125703020]
+sfg.PixelMeasuresSequence[0].SpacingBetweenSlices=0.50251257030209
+sfg.PlaneOrientationVolumeSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
+sfg.PlaneOrientationVolumeSequence[0].ImageOrientationVolume = [1, 0, 0, 0, 1, 0]
 
+### Shared frame PA attributes
+
+### PhotoacousticImageFrameTypeSequence (0018,9835)
+### FrameType (0008,9007)
+### Table C.8-131. Common CT/MR and Photoacoustic Image Description Macro Attributes
+sfg.add_new((0x0018,0x9835),'SQ',[])
+sfg[0x00189835].value.append(pydicom.dataset.Dataset())
+sfg[0x00189835].value[0].add_new((0x0008,0x9007),'CS',['ORIGINAL','PRIMARY','VOLUME','NONE'])
+sfg[0x00189835].value[0].add_new((0x0008,0x9205),'CS',ds.PixelPresentation)
+sfg[0x00189835].value[0].add_new((0x0008,0x9206),'CS','VOLUME')
+sfg[0x00189835].value[0].add_new((0x0008,0x9207),'CS','NONE')
+
+### ImageDataTypeSequence	SQ  1 (0018,9807)
+### ImageDataTypeCodeSequence	SQ	1		(0018,9836)
+sfg.add_new((0x0018,0x9807),'SQ',[])
+sfg[0x00189807].value.append(pydicom.dataset.Dataset())
+sfg[0x00189807].value[0].add_new((0x0018,0x9836),'SQ',[])
+sfg[0x00189807].value[0][0x00189836].value.append(pydicom.dataset.Dataset())
+sfg[0x00189807].value[0][0x00189836].value[0].add_new((0x0008,0x0100),'SH','110819')
+sfg[0x00189807].value[0][0x00189836].value[0].add_new((0x0008,0x0102),'SH','DCM')
+sfg[0x00189807].value[0][0x00189836].value[0].add_new((0x0008,0x0104),'LO','Blood Oxygenation Level')
+
+### Reconstruction Algorithm Sequence  (0018,993D)
+### Algorithm Family Code Sequence (0066,002F) 
+### Algorithm Name (0066,0036)
+### Algorithm Version (0066,0031)
+sfg.add_new((0x0018,0x993D),'SQ',[])
+sfg[0x0018993D].value.append(pydicom.dataset.Dataset())
+sfg[0x0018993D].value[0].add_new((0x0066,0x0036),'LO','WaveLength1-Wavelength2-Relative')
+sfg[0x0018993D].value[0].add_new((0x0066,0x0031),'LO','1.0.0')
+sfg[0x0018993D].value[0].add_new((0x0066,0x002F),'SQ',[])
+sfg[0x0018993D].value[0][0x0066002F].value.append(pydicom.dataset.Dataset())
+sfg[0x0018993D].value[0][0x0066002F].value[0].add_new((0x0008,0x0100),'SH','130821')
+sfg[0x0018993D].value[0][0x0066002F].value[0].add_new((0x0008,0x0102),'SH','DCM')
+sfg[0x0018993D].value[0][0x0066002F].value[0].add_new((0x0008,0x0104),'LO','Spherical Back Projection')
 
 # Save the multipage tiff with jpeg compression
 f = io.BytesIO()
