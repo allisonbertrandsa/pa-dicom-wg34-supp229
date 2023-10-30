@@ -87,6 +87,8 @@ if color:
     ds.SamplesPerPixel = 3
     ds.PhotometricInterpretation = "YBR_FULL_422"
     ds.PixelPresentation = "TRUE_COLOR"
+    # PlanarConfiguration only allowed if SamplesPerPixel GT 1
+    ds.PlanarConfiguration = 0
     # TODO: TRUE_COLOR will also need ICC Profile
 else: 
     ds.SamplesPerPixel = 1
@@ -100,7 +102,6 @@ ds.BitsAllocated = 8
 ds.BitsStored = 8
 ds.HighBit = 7
 ds.PixelRepresentation = 0
-ds.PlanarConfiguration = 0
 ds.PositionMeasuringDeviceUsed='FREEHAND'
 
 # PA Dimension Index Sequence 
@@ -121,8 +122,10 @@ ds.DimensionIndexSequence[2].DimensionIndexPointer=pydicom.tag.Tag((0x0018,0x980
 # Dimension Organization UIDs from eachother
 ##Reuse study UID for all files
 s_uid = pydicom.uid.generate_uid(prefix="1.2.3.123.")
-#Reuse dimension UID for PA files (change for US files)
+# Reuse dimension UID for PA files (change for US files)
 dim_uid = pydicom.uid.generate_uid(prefix="1.2.3.333.")
+# Reuse synchronization UID if PA and US are connected
+synch_uid = pydicom.uid.generate_uid(prefix="1.2.3.456.")
 
 ds.SOPInstanceUID = pydicom.uid.generate_uid(prefix="1.2.3.123.")
 ds.StudyInstanceUID = s_uid
@@ -138,6 +141,12 @@ ds.DimensionIndexSequence[2].DimensionOrganizationUID = dim_uid
 
 ds.FrameOfReferenceUID = pydicom.uid.generate_uid(prefix="1.2.3.111.")
 ds.VolumeFrameOfReferenceUID = pydicom.uid.generate_uid(prefix="1.2.3.222.")
+
+ds.SynchronizationFrameOfReferenceUID = synch_uid
+ds.SynchronizationTrigger = "SOURCE"
+ds.AcquisitionTimeSynchronized = "N"
+# Acquisition Context Sequence - required even if empty
+ds.add_new((0x0040,0x0555),'SQ',[])
 
 # Convert to PIL
 imlist = []
@@ -186,6 +195,14 @@ ds.Rows = img_rows
 ds.Columns = img_cols
 ds.NumberOfFrames = num_frames = i
 
+# C.8.24.2 Ultrasound Frame of Reference Module
+# https://dicom.nema.org/medical/Dicom/current/output/chtml/part03/sect_C.8.24.2.html
+ds.UltrasoundAcquisitionGeometry = "APEX"
+x_offset = float(ds.SharedFunctionalGroupsSequence[0].PixelMeasuresSequence[0].PixelSpacing[0])*ds.Columns/2
+ds.ApexPosition = [x_offset,-5.0,0.0]
+# https://dicom.nema.org/medical/Dicom/current/output/chtml/part03/sect_C.8.24.2.2.html
+ds.VolumeToTransducerMappingMatrix = [0,0,0,x_offset,0,0,0,0,0,0,0,0,0,0,0,1]
+
 # Script hints:
 # PyDICOM: must ADD sequences if not already present:
 #     mySequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
@@ -219,7 +236,7 @@ for i in range(num_frames):
     pfg[i].TemporalPositionSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
 
     pfg[i].FrameContentSequence[0].DimensionIndexValues=[i+1,i+1,padimidx]
-    pfg[i].PlanePositionVolumeSequence[0].ImagePositionVolume=[1,1,i*0.5]
+    pfg[i].PlanePositionVolumeSequence[0].ImagePositionVolume=[1,1,i*0.07]
     pfg[i].TemporalPositionSequence[0].TemporalPositionTimeOffset = i*0.01
     pfg[i].FrameContentSequence[0].FrameAcquisitionDateTime = str(start + Decimal(ds.PerFrameFunctionalGroupsSequence[i].TemporalPositionSequence[0].TemporalPositionTimeOffset).quantize(Decimal('.000001'), rounding=ROUND_HALF_DOWN))
     pfg[i].FrameContentSequence[0].FrameReferenceDateTime = str(Decimal(ds.PerFrameFunctionalGroupsSequence[i].FrameContentSequence[0].FrameAcquisitionDateTime) + Decimal('0.05'))
@@ -316,13 +333,12 @@ for i in range(num_frames):
     pfg[0x00189821].value[1].add_new((0x0018,0x9824),'FD',8+round(random.random(),2))
 
 ### Shared frame DICOM metadata
-ds.FrameIncrementPointer = pydicom.tag.Tag((0x5200,0x9230)) 
 ds.SharedFunctionalGroupsSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
 sfg = ds.SharedFunctionalGroupsSequence[0]
 sfg.PixelMeasuresSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
-sfg.PixelMeasuresSequence[0].SliceThickness="0.1"
-sfg.PixelMeasuresSequence[0].PixelSpacing=[0.50251257030209, 0.5025125703020]
-sfg.PixelMeasuresSequence[0].SpacingBetweenSlices=0.50251257030209
+sfg.PixelMeasuresSequence[0].SliceThickness = 0.089
+sfg.PixelMeasuresSequence[0].PixelSpacing = [0.089, 0.089]
+sfg.PixelMeasuresSequence[0].SpacingBetweenSlices = 0.089
 sfg.PlaneOrientationVolumeSequence = pydicom.sequence.Sequence([pydicom.dataset.Dataset()])
 sfg.PlaneOrientationVolumeSequence[0].ImageOrientationVolume = [1, 0, 0, 0, 1, 0]
 
@@ -347,6 +363,13 @@ sfg[0x00189807].value[0][0x00189836].value.append(pydicom.dataset.Dataset())
 sfg[0x00189807].value[0][0x00189836].value[0].add_new((0x0008,0x0100),'SH','110819')
 sfg[0x00189807].value[0][0x00189836].value[0].add_new((0x0008,0x0102),'SH','DCM')
 sfg[0x00189807].value[0][0x00189836].value[0].add_new((0x0008,0x0104),'LO','Blood Oxygenation Level')
+
+# If using a custom code, recommend adding Coding Scheme Identification Sequence
+# https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_8.2.html#sect_8.2
+# ds.add_new((0x0008,0x0110),'SQ',[])
+# ds[0x00080110].value.append(pydicom.dataset.Dataset())
+# ds[0x00080110].value[0].add_new((0x0008,0x0102),'SH','99SENO')
+# ds.CodingSchemeIdentifcationSequence[0]
 
 ### Reconstruction Algorithm Sequence  (0018,993D)
 ### Algorithm Family Code Sequence (0066,002F) 
