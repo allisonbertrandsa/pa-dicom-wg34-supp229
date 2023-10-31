@@ -10,6 +10,7 @@ Current contents include:
 
 Revision History
 -----------------
+- 31-Oct-23: Examples and script updated after release of PA IOD support in dciodvfy and other dicom3tools (tested with dicom3tools_winexe_1.00.snapshot.20231025083157)
 - 20-Jul-23: Photoacoustic IOD (Supplement 229) released with DICOM 2023c. Examples and encap_PNG_to_PA.py util updated.
 - 85e6027 - New Community example file from PhotoSound  
 - After pa-dicom-wg34-supp229 72a817f - Letter Ballot version
@@ -24,14 +25,12 @@ Examples for Photoacoustic (PA) DICOM Supplement 229
 Directories named "XYZ-PA" have been converted to full PA modality images.  
 Because some tools may not deal well with a new modality, a second
 directory named "XYZ-US_modality" is also included with ultrasound in place of PA for
-Modality, SOP Class UID, and US Image Description Sequence.  A
+Modality, SOP Class UID, and US Image Description Sequence. 
 
 Example Files Known Compatibility (as of Letter Ballot)
 ------------------------------------------------------
 - Aeskulap (Debian, 2007), reads XYZ-PA as stack of frames.
-- Aliza (https://github.com/AlizaMedicalImaging) - Will read the XYZ files.  
-  As of 15-Jan-23 Aliza source update - reads the XYZ-PA files, 
-  compatible with the definitions from pa-dicom-wg34-supp229 72a817f.  
+- Aliza (https://github.com/AlizaMedicalImaging) - Supports the 2023c PA IOD. Will also read the XYZ files.  
   Displays PA and US files as single-frame slices over time by default. To 
   display files as a volume, enable the "Skip 'Dimension Organization' in 
   enhanced multi-frame IODs" and possibly disable "Sort frames in enhanced 
@@ -42,10 +41,10 @@ Example Files Known Compatibility (as of Letter Ballot)
   generate volumes of US and PA files.
 - Visus JiveX Viewer - Reads XYZ-PA and XYZ files.  Displays all files as a stack of frames.
 - Weasis - Reads XYZ-PA and XYZ files.  Displays all files as a stack of frames.
-- dciodvfy - Will partially read the XYZ-PA files.  Will read the XYZ files. 
-- dcmdump - Reads XYZ-PA and XYZ files.
+- dicom3tools including dciodvfy - Reads XYZ-PA files (2023c).  Will read the XYZ files. 
+- dcmdump (dcmtk tools) - Reads XYZ-PA and XYZ files, but not yet supporting 2023c full PA definitions.
 
-New DICOM Tags
+PA DICOM Tags
 ---------------
 Temporary private tags are no longer in use for new PA attributes since official numbers have been assigned.
 For information about what changed in the tags and codes since the Letter Ballot examples, see the yellow highlighted cells in Tag_updates_PC_to_FT_2023c.xlsx
