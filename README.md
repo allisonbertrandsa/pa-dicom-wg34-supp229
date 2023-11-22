@@ -10,6 +10,7 @@ Current contents include:
 
 Revision History
 -----------------
+- 22-Nov-23: Update to Hanging Protocol example to use PA ImageDataTypeCodeSequence
 - 31-Oct-23: Examples and script updated after release of PA IOD support in dciodvfy and other dicom3tools (tested with dicom3tools_winexe_1.00.snapshot.20231025083157)
 - 20-Jul-23: Photoacoustic IOD (Supplement 229) released with DICOM 2023c. Examples and encap_PNG_to_PA.py util updated.
 - 85e6027 - New Community example file from PhotoSound  
@@ -30,7 +31,7 @@ Modality, SOP Class UID, and US Image Description Sequence.
 Example Files Known Compatibility (as of Letter Ballot)
 ------------------------------------------------------
 - Aeskulap (Debian, 2007), reads XYZ-PA as stack of frames.
-- Aliza (https://github.com/AlizaMedicalImaging) - Supports the 2023c PA IOD. Will also read the XYZ files.  
+- Aliza (https://github.com/AlizaMedicalImaging) - Supports the 2023c PA IOD. Will also read the XYZ files. Dictionary includes PA attributes. 
   Displays PA and US files as single-frame slices over time by default. To 
   display files as a volume, enable the "Skip 'Dimension Organization' in 
   enhanced multi-frame IODs" and possibly disable "Sort frames in enhanced 
@@ -40,7 +41,7 @@ Example Files Known Compatibility (as of Letter Ballot)
 - Slicer - Will read the XYZ files.  Will not read the XYZ-PA files.  Will 
   generate volumes of US and PA files.
 - Visus JiveX Viewer - Reads XYZ-PA and XYZ files.  Displays all files as a stack of frames.
-- Weasis - Reads XYZ-PA and XYZ files.  Displays all files as a stack of frames.
+- Weasis - Reads XYZ-PA and XYZ files.  Displays all files as a stack of frames. Dictionary includes PA attributes.
 - dicom3tools including dciodvfy - Reads XYZ-PA files (2023c).  Will read the XYZ files. 
 - dcmdump (dcmtk tools) - Reads XYZ-PA and XYZ files, but not yet supporting 2023c full PA definitions.
 

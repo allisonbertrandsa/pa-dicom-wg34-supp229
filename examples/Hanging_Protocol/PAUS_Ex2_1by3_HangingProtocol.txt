@@ -1,0 +1,178 @@
+
+# Dicom-File-Format
+
+# Dicom-Meta-Information-Header
+# Used TransferSyntax: Little Endian Explicit
+(0002,0000) UL 184                                      #   4, 1 FileMetaInformationGroupLength
+(0002,0001) OB 00\01                                    #   2, 1 FileMetaInformationVersion
+(0002,0002) UI =HangingProtocolStorage                  #  24, 1 MediaStorageSOPClassUID
+(0002,0003) UI [1.2.840.113986.2.664566.21121125.85669.969] #  42, 1 MediaStorageSOPInstanceUID
+(0002,0010) UI =LittleEndianExplicit                    #  20, 1 TransferSyntaxUID
+(0002,0012) UI [1.2.276.0.7230010.3.0.3.6.7]            #  28, 1 ImplementationClassUID
+(0002,0013) SH [OFFIS_DCMTK_367]                        #  16, 1 ImplementationVersionName
+
+# Dicom-Data-Set
+# Used TransferSyntax: Little Endian Explicit
+(0008,0016) UI =HangingProtocolStorage                  #  24, 1 SOPClassUID
+(0008,0018) UI [1.2.840.113986.2.664566.21121125.85669.969] #  42, 1 SOPInstanceUID
+(0072,0002) SH [PAUS-Ex2-1by3]                          #  14, 1 HangingProtocolName
+(0072,0004) LO [PA US Modality 1x3 Example 2 files]     #  34, 1 HangingProtocolDescription
+(0072,0006) CS [SITE]                                   #   4, 1 HangingProtocolLevel
+(0072,0008) LO [34^WG]                                  #   6, 1 HangingProtocolCreator
+(0072,000a) DT [20230412104200]                         #  14, 1 HangingProtocolCreationDateTime
+(0072,000c) SQ (Sequence with explicit length #=1)      #  42, 1 HangingProtocolDefinitionSequence
+  (fffe,e000) na (Item with explicit length #=3)          #  34, 1 Item
+    (0008,0060) CS [US]                                     #   2, 1 Modality
+    (0008,1032) SQ (Sequence with explicit length #=0)      #   0, 1 ProcedureCodeSequence
+    (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+    (0040,100a) SQ (Sequence with explicit length #=0)      #   0, 1 ReasonForRequestedProcedureCodeSequence
+    (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+  (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+(fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+(0072,000e) SQ (Sequence with explicit length #=0)      #   0, 1 HangingProtocolUserIdentificationCodeSequence
+(fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+(0072,0010) LO [WG-34 PA Ex2]                           #  12, 1 HangingProtocolUserGroupName
+(0072,0014) US 0                                        #   2, 1 NumberOfPriorsReferenced
+(0072,0020) SQ (Sequence with explicit length #=3)      # 714, 1 ImageSetsSequence
+  (fffe,e000) na (Item with explicit length #=2)          # 176, 1 Item
+    (0072,0022) SQ (Sequence with explicit length #=1)      #  66, 1 ImageSetSelectorSequence
+      (fffe,e000) na (Item with explicit length #=5)          #  58, 1 Item
+        (0072,0024) CS [NO_MATCH]                               #   8, 1 ImageSetSelectorUsageFlag
+        (0072,0026) AT (0008,0060)                              #   4, 1 SelectorAttribute
+        (0072,0028) US 1                                        #   2, 1 SelectorValueNumber
+        (0072,0050) CS [CS]                                     #   2, 1 SelectorAttributeVR
+        (0072,0062) CS [US]                                     #   2, 1 SelectorCSValue
+      (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+    (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+    (0072,0030) SQ (Sequence with explicit length #=1)      #  86, 1 TimeBasedImageSetsSequence
+      (fffe,e000) na (Item with explicit length #=5)          #  78, 1 Item
+        (0072,0032) US 1                                        #   2, 1 ImageSetNumber
+        (0072,0034) CS [RELATIVE_TIME]                          #  14, 1 ImageSetSelectorCategory
+        (0072,0038) US 0\0                                      #   4, 2 RelativeTime
+        (0072,003a) CS [MINUTES]                                #   8, 1 RelativeTimeUnits
+        (0072,0040) LO [Ultrasound]                             #  10, 1 ImageSetLabel
+      (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+    (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+  (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+  (fffe,e000) na (Item with explicit length #=2)          # 266, 1 Item
+    (0072,0022) SQ (Sequence with explicit length #=1)      # 146, 1 ImageSetSelectorSequence
+      (fffe,e000) na (Item with explicit length #=6)          # 138, 1 Item
+        (0020,9167) AT (0018,9807)                              #   4, 1 FunctionalGroupPointer
+        (0072,0024) CS [NO_MATCH]                               #   8, 1 ImageSetSelectorUsageFlag
+        (0072,0026) AT (0018,9836)                              #   4, 1 SelectorAttribute
+        (0072,0028) US 1                                        #   2, 1 SelectorValueNumber
+        (0072,0050) CS [SQ]                                     #   2, 1 SelectorAttributeVR
+        (0072,0080) SQ (Sequence with explicit length #=1)      #  66, 1 SelectorCodeSequenceValue
+          (fffe,e000) na (Item with explicit length #=3)          #  58, 1 Item
+            (0008,0100) SH [110819]                                 #   6, 1 CodeValue
+            (0008,0102) SH [DCM]                                    #   4, 1 CodingSchemeDesignator
+            (0008,0104) LO [Blood Oxygenation Level]                #  24, 1 CodeMeaning
+          (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+        (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+      (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+    (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+    (0072,0030) SQ (Sequence with explicit length #=1)      #  96, 1 TimeBasedImageSetsSequence
+      (fffe,e000) na (Item with explicit length #=5)          #  88, 1 Item
+        (0072,0032) US 2                                        #   2, 1 ImageSetNumber
+        (0072,0034) CS [RELATIVE_TIME]                          #  14, 1 ImageSetSelectorCategory
+        (0072,0038) US 0\0                                      #   4, 2 RelativeTime
+        (0072,003a) CS [MINUTES]                                #   8, 1 RelativeTimeUnits
+        (0072,0040) LO [PA Blood Oxygenation]                   #  20, 1 ImageSetLabel
+      (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+    (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+  (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+  (fffe,e000) na (Item with explicit length #=2)          # 248, 1 Item
+    (0072,0022) SQ (Sequence with explicit length #=1)      # 132, 1 ImageSetSelectorSequence
+      (fffe,e000) na (Item with explicit length #=6)          # 124, 1 Item
+        (0020,9167) AT (0018,9807)                              #   4, 1 FunctionalGroupPointer
+        (0072,0024) CS [NO_MATCH]                               #   8, 1 ImageSetSelectorUsageFlag
+        (0072,0026) AT (0018,9836)                              #   4, 1 SelectorAttribute
+        (0072,0028) US 1                                        #   2, 1 SelectorValueNumber
+        (0072,0050) CS [SQ]                                     #   2, 1 SelectorAttributeVR
+        (0072,0080) SQ (Sequence with explicit length #=1)      #  52, 1 SelectorCodeSequenceValue
+          (fffe,e000) na (Item with explicit length #=3)          #  44, 1 Item
+            (0008,0100) SH [110831]                                 #   6, 1 CodeValue
+            (0008,0102) SH [DCM]                                    #   4, 1 CodingSchemeDesignator
+            (0008,0104) LO [Perfusion]                              #  10, 1 CodeMeaning
+          (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+        (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+      (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+    (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+    (0072,0030) SQ (Sequence with explicit length #=1)      #  92, 1 TimeBasedImageSetsSequence
+      (fffe,e000) na (Item with explicit length #=5)          #  84, 1 Item
+        (0072,0032) US 3                                        #   2, 1 ImageSetNumber
+        (0072,0034) CS [RELATIVE_TIME]                          #  14, 1 ImageSetSelectorCategory
+        (0072,0038) US 0\0                                      #   4, 2 RelativeTime
+        (0072,003a) CS [MINUTES]                                #   8, 1 RelativeTimeUnits
+        (0072,0040) LO [PA Perfusion WL1]                       #  16, 1 ImageSetLabel
+      (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+    (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+  (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+(fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+(0072,0100) US 1                                        #   2, 1 NumberOfScreens
+(0072,0102) SQ (Sequence with explicit length #=1)      #  88, 1 NominalScreenDefinitionSequence
+  (fffe,e000) na (Item with explicit length #=5)          #  80, 1 Item
+    (0072,0104) US 2048                                     #   2, 1 NumberOfVerticalPixels
+    (0072,0106) US 2048                                     #   2, 1 NumberOfHorizontalPixels
+    (0072,0108) FD 0\1\1\0                                  #  32, 4 DisplayEnvironmentSpatialPosition
+    (0072,010c) US 8                                        #   2, 1 ScreenMinimumColorBitDepth
+    (0072,010e) US 70                                       #   2, 1 ApplicationMaximumRepaintTime
+  (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+(fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+(0072,0200) SQ (Sequence with explicit length #=3)      # 484, 1 DisplaySetsSequence
+  (fffe,e000) na (Item with explicit length #=7)          # 184, 1 Item
+    (0072,0032) US 1                                        #   2, 1 ImageSetNumber
+    (0072,0202) US 1                                        #   2, 1 DisplaySetNumber
+    (0072,0204) US 1                                        #   2, 1 DisplaySetPresentationGroup
+    (0072,0206) LO [PA US Blood Oxygenation and Perfusion]  #  38, 1 DisplaySetPresentationGroupDescription
+    (0072,0300) SQ (Sequence with explicit length #=1)      #  72, 1 ImageBoxesSequence
+      (fffe,e000) na (Item with explicit length #=3)          #  64, 1 Item
+        (0072,0108) FD 0\1\0.33000000000000003\0                #  32, 4 DisplayEnvironmentSpatialPosition
+        (0072,0302) US 1                                        #   2, 1 ImageBoxNumber
+        (0072,0304) CS [STACK]                                  #   6, 1 ImageBoxLayoutType
+      (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+    (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+    (0072,0400) SQ (Sequence with explicit length #=0)      #   0, 1 FilterOperationsSequence
+    (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+    (0072,0600) SQ (Sequence with explicit length #=0)      #   0, 1 SortingOperationsSequence
+    (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+  (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+  (fffe,e000) na (Item with explicit length #=6)          # 138, 1 Item
+    (0072,0032) US 2                                        #   2, 1 ImageSetNumber
+    (0072,0202) US 2                                        #   2, 1 DisplaySetNumber
+    (0072,0204) US 1                                        #   2, 1 DisplaySetPresentationGroup
+    (0072,0300) SQ (Sequence with explicit length #=1)      #  72, 1 ImageBoxesSequence
+      (fffe,e000) na (Item with explicit length #=3)          #  64, 1 Item
+        (0072,0108) FD 0.33000000000000003\1\0.66000000000000005\0 #  32, 4 DisplayEnvironmentSpatialPosition
+        (0072,0302) US 1                                        #   2, 1 ImageBoxNumber
+        (0072,0304) CS [STACK]                                  #   6, 1 ImageBoxLayoutType
+      (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+    (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+    (0072,0400) SQ (Sequence with explicit length #=0)      #   0, 1 FilterOperationsSequence
+    (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+    (0072,0600) SQ (Sequence with explicit length #=0)      #   0, 1 SortingOperationsSequence
+    (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+  (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+  (fffe,e000) na (Item with explicit length #=6)          # 138, 1 Item
+    (0072,0032) US 3                                        #   2, 1 ImageSetNumber
+    (0072,0202) US 3                                        #   2, 1 DisplaySetNumber
+    (0072,0204) US 1                                        #   2, 1 DisplaySetPresentationGroup
+    (0072,0300) SQ (Sequence with explicit length #=1)      #  72, 1 ImageBoxesSequence
+      (fffe,e000) na (Item with explicit length #=3)          #  64, 1 Item
+        (0072,0108) FD 0.66000000000000005\1\1\0                #  32, 4 DisplayEnvironmentSpatialPosition
+        (0072,0302) US 1                                        #   2, 1 ImageBoxNumber
+        (0072,0304) CS [STACK]                                  #   6, 1 ImageBoxLayoutType
+      (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+    (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+    (0072,0400) SQ (Sequence with explicit length #=0)      #   0, 1 FilterOperationsSequence
+    (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+    (0072,0600) SQ (Sequence with explicit length #=0)      #   0, 1 SortingOperationsSequence
+    (fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+  (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+(fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
+(0072,0208) CS [MAINTAIN_LAYOUT]                        #  16, 1 PartialDataDisplayHandling
+(0072,0210) SQ (Sequence with explicit length #=1)      #  22, 1 SynchronizedScrollingSequence
+  (fffe,e000) na (Item with explicit length #=1)          #  14, 1 Item
+    (0072,0212) US 1\2\3                                    #   6, 3 DisplaySetScrollingGroup
+  (fffe,e00d) na (ItemDelimitationItem for re-encoding)   #   0, 0 ItemDelimitationItem
+(fffe,e0dd) na (SequenceDelimitationItem for re-encod.) #   0, 0 SequenceDelimitationItem
